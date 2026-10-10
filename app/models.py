@@ -10,9 +10,16 @@ class LinkedInPost(BaseModel):
 
 
 class SearchRequest(BaseModel):
-    queries: list[str] = Field(..., min_length=1)
+    queries: list[str] = Field(default_factory=list)
     max_posts_per_query: int = Field(default=5, ge=1, le=10)
     min_relevance: int = Field(default=4, ge=0, le=10)
+
+    @field_validator("queries")
+    @classmethod
+    def sanitize_queries(cls, value):
+        if value is None:
+            return []
+        return [str(item).strip() for item in value if str(item).strip()]
 
 
 class PostAnalysis(BaseModel):

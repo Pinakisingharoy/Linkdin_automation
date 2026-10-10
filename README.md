@@ -73,6 +73,17 @@ curl -X POST http://localhost:8000/search \
   }'
 ```
 
+## LinkedIn login (real account mode)
+
+If you want the app to use your own LinkedIn account, set these environment variables before starting the server:
+
+```bash
+export LINKEDIN_EMAIL="your_email@example.com"
+export LINKEDIN_PASSWORD="your_password"
+```
+
+The app will automatically try the live LinkedIn browser login path first. If the credentials are not available, it falls back to the safe mock dataset for testing.
+
 ## Notes
 
 - This service intentionally does not send connection requests.

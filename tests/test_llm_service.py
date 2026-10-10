@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+from app.services.linkedin import build_search_queries_from_cv, get_linkedin_credentials
 from app.services.llm import AnalysisResult, analyze_post
 
 
@@ -68,3 +69,33 @@ async def test_analyze_post_rejects_low_relevance(monkeypatch):
 
     assert result.relevance_score == 2
     assert result.connection_note == ""
+
+
+def test_build_search_queries_from_cv_uses_skills_in_summary():
+    cv_summary = (
+        "Python-focused backend developer with FastAPI, Django, REST API design, "
+        "database integration, and AI-assisted product workflows."
+    )
+
+    queries = build_search_queries_from_cv(cv_summary)
+
+    assert "Python developer" in queries
+    assert "FastAPI developer" in queries
+    assert "Django backend engineer" in queries
+    assert "REST API developer" in queries
+    assert "AI engineer" in queries
+
+
+def test_build_search_queries_from_cv_falls_back_to_default_when_summary_is_blank():
+    assert build_search_queries_from_cv("")
+    assert "Python developer" in build_search_queries_from_cv("")
+
+
+def test_get_linkedin_credentials_reads_env(monkeypatch):
+    monkeypatch.setenv("LINKEDIN_EMAIL", "pinaki@example.com")
+    monkeypatch.setenv("LINKEDIN_PASSWORD", "secret123")
+
+    creds = get_linkedin_credentials()
+
+    assert creds["email"] == "pinaki@example.com"
+    assert creds["password"] == "secret123"

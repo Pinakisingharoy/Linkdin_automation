@@ -1,10 +1,11 @@
 from app.models import SearchRequest, SearchResponse
-from app.services.linkedin import fetch_posts_for_queries
+from app.services.linkedin import build_search_queries_from_cv, fetch_posts_for_queries
 from app.services.llm import analyze_post
 
 
 async def run_search(request: SearchRequest, cv_summary: str) -> SearchResponse:
-    posts = fetch_posts_for_queries(request.queries, request.max_posts_per_query)
+    queries = request.queries or build_search_queries_from_cv(cv_summary)
+    posts = fetch_posts_for_queries(queries, request.max_posts_per_query)
     results = []
 
     for post in posts:
